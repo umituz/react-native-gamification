@@ -43,4 +43,59 @@ export interface LeaderboardRanking {
   belowUsers: number; // Number of users below
 }
 
+export type LeaderboardCategory = 'points' | 'achievements' | 'streaks' | 'activity';
+
+/**
+ * Factory function to create leaderboard entry
+ */
+export function createLeaderboardEntry(
+  props: Omit<LeaderboardEntry, 'id' | 'createdDate' | 'updatedDate' | 'change'> & { previousRank?: number }
+): LeaderboardEntry {
+  const now = new Date().toISOString();
+  const change = props.previousRank ? props.previousRank - props.rank : 0;
+  
+  return {
+    ...props,
+    id: `entry-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+    createdDate: now,
+    updatedDate: now,
+    metadata: {
+      ...props.metadata,
+      change,
+    },
+  };
+}
+
+/**
+ * Calculate rank change indicator
+ */
+export function getRankChangeIndicator(change: number): '↑' | '↓' | '=' {
+  if (change > 0) return '↑'; // Improved (moved up)
+  if (change < 0) return '↓'; // Declined (moved down)
+  return '='; // No change
+}
+
+/**
+ * Get top N entries from leaderboard
+ */
+export function getTopEntries(
+  leaderboard: Leaderboard,
+  limit: number = 10
+): LeaderboardEntry[] {
+  return leaderboard.entries
+    .sort((a, b) => a.rank - b.rank)
+    .slice(0, limit);
+}
+
+/**
+ * Find user's position in leaderboard
+ */
+export function findUserRank(
+  leaderboard: Leaderboard,
+  userId: string
+): LeaderboardEntry | null {
+  return leaderboard.entries.find((entry) => entry.userId === userId) || null;
+}
+
+
 

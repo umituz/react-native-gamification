@@ -731,3 +731,4 @@ class StorageGamificationRepository implements IGamificationRepository {
 export const storageGamificationRepository = new StorageGamificationRepository();
 
 
+

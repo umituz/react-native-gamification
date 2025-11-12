@@ -44,4 +44,55 @@ export interface AchievementProgress {
   unlocked: boolean;
 }
 
+export type AchievementDifficulty = 'easy' | 'medium' | 'hard' | 'legendary';
+export type AchievementCategory = 'milestone' | 'challenge' | 'streak' | 'social' | 'special';
+
+/**
+ * Factory function to create an achievement
+ */
+export function createAchievement(
+  props: Omit<Achievement, 'id' | 'unlocked' | 'createdDate' | 'updatedDate'>
+): Achievement {
+  const now = new Date().toISOString();
+  return {
+    ...props,
+    id: `achievement-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+    unlocked: props.progress >= props.requirement,
+    createdDate: now,
+    updatedDate: now,
+  };
+}
+
+/**
+ * Check if achievement is complete
+ */
+export function isAchievementComplete(achievement: Achievement): boolean {
+  return achievement.progress >= achievement.requirement;
+}
+
+/**
+ * Calculate achievement progress percentage
+ */
+export function calculateAchievementProgress(achievement: Achievement): number {
+  if (achievement.requirement === 0) return 0;
+  return Math.min(100, Math.round((achievement.progress / achievement.requirement) * 100));
+}
+
+/**
+ * Get points for achievement difficulty/rarity
+ */
+export function getPointsForDifficulty(rarity: Achievement['rarity'] | AchievementDifficulty): number {
+  const pointsMap: Record<string, number> = {
+    easy: 10,
+    medium: 25,
+    hard: 50,
+    legendary: 100,
+    common: 10,
+    rare: 25,
+    epic: 50,
+  };
+  return pointsMap[rarity || 'common'] || 10;
+}
+
+
 
