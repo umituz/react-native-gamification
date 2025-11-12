@@ -43,3 +43,4 @@ export interface LeaderboardRanking {
   belowUsers: number; // Number of users below
 }
 
+

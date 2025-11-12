@@ -231,3 +231,4 @@ export interface IGamificationRepository {
   updateProgress(update: ProgressUpdate): Promise<GamificationResult<Progress>>;
 }
 
+

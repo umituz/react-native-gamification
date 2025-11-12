@@ -36,3 +36,4 @@ export interface StreakProgress {
   nextMilestone?: number; // Next milestone value
 }
 
+
