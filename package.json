@@ -1,6 +1,6 @@
 {
   "name": "@umituz/react-native-gamification",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Comprehensive gamification system for React Native apps with achievements, points, levels, streaks, leaderboards, rewards, and progress tracking",
   "main": "./src/index.ts",
   "types": "./src/index.ts",

@@ -41,7 +41,7 @@ interface GamificationStore {
 
   // Actions - Achievements
   loadAchievements: () => Promise<void>;
-  updateAchievementProgress: (achievementId: string, progress: number) => Promise<void>;
+  updateAchievementProgress: (achievementId: string, progressIncrement: number) => Promise<void>;
   unlockAchievement: (achievementId: string) => Promise<void>;
 
   // Actions - Points
@@ -140,17 +140,30 @@ export const useGamificationStore = create<GamificationStore>((set, get) => ({
     }
   },
 
-  updateAchievementProgress: async (achievementId: string, progress: number) => {
+  updateAchievementProgress: async (achievementId: string, progressIncrement: number) => {
     const { userId, repository } = get();
     if (!userId) return;
-    const result = await repository.updateAchievementProgress(userId, achievementId, progress);
+    
+    // Find existing achievement to get current progress
+    const existingAchievement = get().achievements.find((a) => a.id === achievementId);
+    if (!existingAchievement) {
+      /* eslint-disable-next-line no-console */
+      if (__DEV__) console.warn(`Achievement ${achievementId} not found, cannot update progress`);
+      return;
+    }
+    
+    // Calculate new progress (add increment to current progress)
+    const currentProgress = existingAchievement.progress || 0;
+    const newProgress = Math.min(currentProgress + progressIncrement, existingAchievement.requirement);
+    
+    const result = await repository.updateAchievementProgress(userId, achievementId, newProgress);
     if (result.success) {
       const achievements = get().achievements.map((a) =>
         a.id === achievementId ? result.data : a,
       );
       set({ achievements });
       // Check if achievement should be unlocked
-      if (progress >= result.data.requirement && !result.data.unlocked) {
+      if (newProgress >= result.data.requirement && !result.data.unlocked) {
         await get().unlockAchievement(achievementId);
       }
     }
